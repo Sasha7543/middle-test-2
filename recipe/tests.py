@@ -42,3 +42,30 @@ class MainViewTests(TestCase):
         )
         self.assertContains(response, 'Recipe 5')
         self.assertNotContains(response, 'Recipe 0')
+
+
+class CategoryListViewTests(TestCase):
+    def test_category_list_view_shows_categories_with_recipe_count(self):
+        breakfast = Category.objects.create(name='Breakfast')
+        dinner = Category.objects.create(name='Dinner')
+        Recipe.objects.create(
+            title='Omelette',
+            description='Simple breakfast',
+            instructions='Cook eggs',
+            ingredients='Eggs',
+            category=breakfast,
+        )
+        Recipe.objects.create(
+            title='Pancakes',
+            description='Sweet breakfast',
+            instructions='Cook batter',
+            ingredients='Flour',
+            category=breakfast,
+        )
+
+        response = self.client.get(reverse('category_list'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'category_list.html')
+        self.assertContains(response, 'Breakfast (2)')
+        self.assertContains(response, 'Dinner (0)')
